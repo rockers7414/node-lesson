@@ -24,10 +24,31 @@ class User {
       try {
         const collection = await Database.getCollection('users');
         const queryResult = await collection.findOne({ email: email });
+
         let user = null;
 
         if (queryResult) {
           user = new User(queryResult.firstName, queryResult.lastName, queryResult.email, queryResult.password);
+          user._id = queryResult._id;
+        }
+
+        resolve(user);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  static getUserById(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const collection = await Database.getCollection('users');
+        const queryResult = await collection.findOne({ _id: new ObjectID(id) });
+
+        let user = null;
+
+        if (queryResult) {
+          user = new User(queryResult.firstName, queryResult.lastName, queryResult.email, queryResult, queryResult.password);
           user._id = queryResult._id;
         }
 
@@ -62,6 +83,21 @@ class User {
         reject(err);
       }
     });
+  }
+
+  async isAdmin() {
+    if (!this._id) {
+      return false;
+    }
+
+    const collection = await Database.getCollection('admins');
+    const queryResult = await collection.findOne({ _id: this._id });
+
+    if (queryResult) {
+      return true;
+    }
+
+    return false;
   }
 }
 
