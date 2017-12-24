@@ -16,6 +16,7 @@ class Auth {
 
         const cert = fs.readFileSync(process.cwd() + '/credentials/demo');
         const payload = {
+          exp: Math.floor(Date.now() / 1000) + 10,
           name: user.firstName,
           email: user.email,
           admin: await user.isAdmin()
